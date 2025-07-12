@@ -5,8 +5,8 @@ from trl import SFTTrainer
 from transformers import TrainingArguments
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = "unsloth/gemma-3-12b-it-GGUF",
-    max_sequence_length = 2048,
+    model_name = "unsloth/gemma-3-4b-it-unsloth-bnb-4bit",
+    max_seq_length = 2048,
     dtype = None,
     load_in_4bit = True,
 )
@@ -37,7 +37,7 @@ trainer = SFTTrainer(
         per_device_train_batch_size= 2,
         gradient_accumulation_steps = 4,
         warmup_steps = 5,
-        max_steps = 60,
+        max_steps = 1000,
         learning_rate = 2e-4,
         fp16 = not torch.cuda.is_bf16_supported(),
         bf16 = torch.cuda.is_bf16_supported(),

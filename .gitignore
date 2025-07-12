@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# model files
+career-app/unsloth_compiled_cache
+career-app/models/**/*.safetensors
+
 # C extensions
 *.so
 
