@@ -102,6 +102,8 @@ const Index = () => {
                   placeholder="Ask me anything..." 
                   className="flex-1 bg-background border-border"
                   value={userQuery}
+                  onKeyUp={(e) => e.key === "Enter" && handleSendMessage()}
+                  onKeyDown={(e) => e.key === "Enter" && e.shiftKey && e.preventDefault()}
                   onChange={(e) => setUserQuery(e.target.value)}
                 />
                 <Button className="bg-gradient-primary hover:opacity-90 shrink-0" onClick={handleSendMessage} disabled={!userQuery.trim()}>
