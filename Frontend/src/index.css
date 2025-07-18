@@ -160,6 +160,17 @@
     opacity: 1;
   }
 }
+@keyframes blurIn {
+  from {
+    filter: blur(6px);
+    opacity: 0;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
 
 /* ===== ANIMATION CLASSES ===== */
 .animate-accordion-down {
@@ -176,4 +187,8 @@
 
 .animate-scale-in {
   animation: scale-in 0.2s ease-out;
+}
+.blur-in {
+  display: inline-block;
+  animation: blurIn 0.3s ease;
 }

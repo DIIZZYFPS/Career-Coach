@@ -6,6 +6,8 @@ import { mockMessages } from "@/data/mockMessages";
 import { Bot, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import api from "@/lib/api";
+import fetchStreamedResponse from "@/lib/Stream";
 
 type Message = {
   id: string;
@@ -22,8 +24,8 @@ const Index = () => {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [userQuery, setUserQuery] = useState("");
 
-  const handleFileUpload = (file: File, description: string) => {
-    const firstMessage = {
+  const handleFileUpload = async (file: File, description: string) => {
+    const userMessage = {
       id: "upload-1",
       content: `I've uploaded a file: ${file.name}\n\n${description}`,
       sender: {
@@ -32,12 +34,46 @@ const Index = () => {
       },
       timestamp: new Date(),
     };
+
     
-    setChatMessages([firstMessage, ...mockMessages]);
     setHasStartedChat(true);
+    // Add the user message immediately
+    setChatMessages((prev) => [userMessage, ...prev]);
+    setUserQuery("");
+
+    // Prepare a placeholder for the streaming AI message
+    const aiMessageId = `ai-${Date.now() + 1}`;
+    let aiContent = "";
+
+    setChatMessages((prev) => [
+      {
+        id: aiMessageId,
+        content: "",
+        sender: { name: "AI Assistant", type: "ai" },
+        timestamp: new Date(),
+      },
+      ...prev,
+    ]);
+
+    // Stream the response and update the AI message as tokens arrive
+    await fetchStreamedResponse(
+      userMessage.content,
+      userMessage.content,
+      (token) => {
+        aiContent += token;
+        setChatMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === aiMessageId
+              ? { ...msg, content: aiContent }
+              : msg
+          )
+        );
+      },
+      file
+    );
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!userQuery.trim()) return;
 
     const userMessage: Message = {
@@ -47,15 +83,40 @@ const Index = () => {
       timestamp: new Date(),
     };
 
-    const aiMessage: Message = {
-      id: `ai-${Date.now() + 1}`,
-      content: `This is a mock response to "${userQuery}".`,
-      sender: { name: "AI Assistant", type: "ai" },
-      timestamp: new Date(),
-    };
-
-    setChatMessages((prev) => [aiMessage, userMessage, ...prev]);
+    // Add the user message immediately
+    setChatMessages((prev) => [userMessage, ...prev]);
     setUserQuery("");
+
+    // Prepare a placeholder for the streaming AI message
+    const aiMessageId = `ai-${Date.now() + 1}`;
+    let aiContent = "";
+
+    setChatMessages((prev) => [
+      {
+        id: aiMessageId,
+        content: "",
+        sender: { name: "AI Assistant", type: "ai" },
+        timestamp: new Date(),
+      },
+      ...prev,
+    ]);
+
+    // Stream the response and update the AI message as tokens arrive
+    await fetchStreamedResponse(
+      userMessage.content,
+      userMessage.content,
+      (token) => {
+        aiContent += token;
+        setChatMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === aiMessageId
+              ? { ...msg, content: aiContent }
+              : msg
+          )
+        );
+      },
+      null // No file provided in this context
+    );
   };
 
   if (!hasStartedChat) {

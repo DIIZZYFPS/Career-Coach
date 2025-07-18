@@ -3,3 +3,6 @@ unsloth
 datasets
 trl
 transformers
+fastapi
+uvicorn
+python-multipart
