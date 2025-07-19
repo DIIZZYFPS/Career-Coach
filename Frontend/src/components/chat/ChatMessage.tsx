@@ -3,6 +3,9 @@ import { cn } from "@/lib/utils";
 import { Bot, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
+import ReactMarkdown from 'react-markdown';
+
+
 
 
 interface ChatMessageProps {
@@ -54,28 +57,7 @@ export function ChatMessage({
                     "text-foreground leading-relaxed",
                     isUser && "font-medium"
                 )} style={{ whiteSpace: "pre-wrap" }}>
-                    {content.split('\n').map((paragraph, index) => (
-                        <p key={index} className={cn(
-                            "mb-3 last:mb-0",
-                            isUser ? "text-foreground" : "text-foreground/90"
-                        )}>
-                            {isUser
-                                ? paragraph
-                                : paragraph.split(/(\s+)/).map((part, i) =>
-                                    part.trim() === ""
-                                        ? part // preserve whitespace as-is
-                                        : (
-                                            <span
-                                                key={i}
-                                                className="blur-in"
-                                            >
-                                                {part}
-                                            </span>
-                                        )
-                                )
-                            }
-                        </p>
-                    ))}
+                    <ReactMarkdown>{content}</ReactMarkdown>
                 </div>
             </div>
         </div>

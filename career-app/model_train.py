@@ -4,6 +4,7 @@ from datasets import load_dataset
 from trl import SFTTrainer
 from transformers import TrainingArguments
 
+# --- Model Loading (Unchanged) ---
 model, tokenizer = FastLanguageModel.from_pretrained(
     model_name = "unsloth/gemma-3-4b-it-unsloth-bnb-4bit",
     max_seq_length = 2048,
@@ -11,6 +12,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     load_in_4bit = True,
 )
 
+# --- PEFT Model Setup (Unchanged) ---
 model = FastLanguageModel.get_peft_model(
     model,
     r = 16,
@@ -23,8 +25,10 @@ model = FastLanguageModel.get_peft_model(
     loftq_config = None
 )
 
+# --- Dataset Loading (Unchanged) ---
 dataset = load_dataset("json", data_files="dataset_formatted.jsonl", split="train")
 
+# --- Trainer Setup (Unchanged) ---
 trainer = SFTTrainer(
     model = model,
     tokenizer = tokenizer,
@@ -50,4 +54,15 @@ trainer = SFTTrainer(
     ),
 )
 
+# --- Training (Unchanged) ---
+print("Starting model training...")
 trainer.train()
+print("✅ Training complete!")
+
+
+# --- ADD THESE TWO LINES ---
+# This explicitly saves the final adapter configuration and tokenizer files.
+print("Saving final model and tokenizer...")
+model.save_pretrained("models")
+tokenizer.save_pretrained("models")
+print("✅ Model and tokenizer saved successfully to 'models' directory!")

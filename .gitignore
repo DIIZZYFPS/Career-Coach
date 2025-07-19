@@ -5,7 +5,7 @@ __pycache__/
 
 # model files
 career-app/unsloth_compiled_cache
-career-app/models/**/*.safetensors
+career-app/models/
 
 # C extensions
 *.so
