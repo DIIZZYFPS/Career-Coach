@@ -31,15 +31,23 @@ try:
 except Exception as e:
     print(f"🚨 Error loading model: {e}")
 
-# --- 2. Custom Streamer (Unchanged) ---
 class QueueTextStreamer(TextStreamer):
     def __init__(self, tokenizer, skip_prompt: bool = True, **kwargs):
         super().__init__(tokenizer, skip_prompt, **kwargs)
         self.text_queue = Queue()
+        # Define the specific string we want to stop and remove
+        self.stop_string = "<|im_end|>"
 
     def on_finalized_text(self, text: str, stream_end: bool = False):
-        self.text_queue.put(text)
+        """
+        This method is called by the streamer with new text.
+        We clean the text before putting it into our queue.
+        """
+        # Remove the stop string from the output
+        clean_text = text.replace(self.stop_string, "")
+        self.text_queue.put(clean_text)
         if stream_end:
+            # When the stream ends, put the "end" token.
             self.text_queue.put(None)
 
 # --- 3. FastAPI Application Setup (Unchanged) ---
@@ -53,16 +61,18 @@ app.add_middleware(
 )
 
 # --- 4. File Reading Functions (Unchanged) ---
-def read_pdf(file_bytes: bytes) -> str:
+def read_pdf(file) -> str:
     import fitz
+    file_bytes = file.file.read()
     doc = fitz.open(stream=file_bytes, filetype="pdf")
     text = ""
     for page in doc:
         text += page.get_text()
     return text
 
-def read_docx(file_bytes: bytes) -> str:
+def read_docx(file) -> str:
     from docx import Document
+    file_bytes = file.file.read()
     doc = Document(io.BytesIO(file_bytes))
     text = ""
     for para in doc.paragraphs:
@@ -76,7 +86,19 @@ class Message(BaseModel):
 
 def format_prompt_from_history(conversation_history: List[Message]):
     system_prompt = """<|im_start|>system
-You are a career coaching AI assistant. Analyze resumes against job descriptions and provide helpful career guidance. <|im_end|>
+You are a career coaching AI assistant. Analyze resumes against job descriptions and provide helpful career guidance.
+
+Instructions:
+1. Analyze the provided resume (if provided) against the job description. Identify skill gaps, suggest learning resources, and generate relevant interview questions.
+2. If a resume is attached, extract key skills and experiences to tailor your advice.
+3. Provide actionable career advice based on the job description and resume.
+4. If no resume is provided, focus on the job description to suggest skills to learn and interview preparation tips.
+5. If you are unsure about a specific skill or topic, ask clarifying questions to the user.
+6. Do not include any system prompts or instructions in your response.
+7. If you are uncertain about something DO NOT make assumptions, instead ask the user for clarification.
+8. Always end your response with "<|im_end|>" to signal the end of your message.
+9. Do not use <|im_start|> tags in your response.
+ <|im_end|>
 """
     chat_history = ""
     for message in conversation_history:
@@ -119,6 +141,8 @@ async def query_career_coach(
     
     streamer = QueueTextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
 
+    eos_token_id = tokenizer.eos_token_id
+
     generation_kwargs = dict(
         inputs,
         streamer=streamer,
@@ -126,7 +150,8 @@ async def query_career_coach(
         do_sample=True,
         temperature=0.7,
         top_p=0.95,
-        top_k=50
+        top_k=50, 
+        eos_token_id=eos_token_id
     )
 
     thread = threading.Thread(target=model.generate, kwargs=generation_kwargs)
