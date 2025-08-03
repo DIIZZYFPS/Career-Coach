@@ -65,12 +65,12 @@ jobs:
         run: npm install
         working-directory: Frontend/ui
 
-      - name: Set up portable Python
+      - name: Set up portable Python for Windows
         shell: powershell
         run: |
           Invoke-WebRequest -Uri https://github.com/astral-sh/python-build-standalone/releases/download/20250610/cpython-3.11.13+20250610-x86_64-pc-windows-msvc-install_only.tar.gz -OutFile python.tar.gz
-          tar -xzf python.tar.gz -C career-app/
-          Move-Item -Path career-app/python -Destination career-app/venv
+          tar -xzf python.tar.gz
+          Move-Item -Path python -Destination career-app/python-portable
 
       - name: Install Python dependencies
         run: |

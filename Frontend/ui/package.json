@@ -57,7 +57,7 @@
     "vite": "^7.0.4",
     "wait-on": "^8.0.4"
   },
-  "build": {
+ "build": {
     "appId": "com.example.careerCoach",
     "productName": "Career Coach",
     "files": [
@@ -65,6 +65,17 @@
       "dist-electron",
       "package.json"
     ],
+ "extraResources": [
+    {
+      "from": "../../career-app",
+      "to": "app/career-app",
+      "filter": [
+        "**/*",
+        "!venv/**/*",
+        "python-portable/**/*"
+      ]
+    }
+  ],
     "directories": {
       "buildResources": "assets",
       "output": "release"
