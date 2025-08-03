@@ -46,16 +46,30 @@ function createWindow() {
   }
 }
 const startBackend = () => {
-  const serverPath = app.isPackaged ? path.join(process.resourcesPath, "app", "career-app") : path.join(__dirname, "..", "..", "career-app");
-  const pythonExecutable = app.isPackaged ? process.platform === "win32" ? path.join(serverPath, "venv", "python.exe") : path.join(serverPath, "venv", "bin", "python") : "python";
+  const serverPath = app.isPackaged 
+    ? path.join(process.resourcesPath, "app", "career-app") 
+    : path.join(__dirname, "..", "..", "career-app");
+  
+  // Use full path for development mode
+  const pythonExecutable = app.isPackaged 
+    ? (process.platform === "win32" 
+        ? path.join(serverPath, "venv", "Scripts", "python.exe") 
+        : path.join(serverPath, "venv", "bin", "python"))
+    : (process.platform === "win32" 
+        ? path.join(serverPath, "venv", "Scripts", "python.exe")
+        : path.join(serverPath, "venv", "bin", "python"));
+  
   console.log(`Attempting to start backend with: ${pythonExecutable}`);
-  if (app.isPackaged && !fs.existsSync(pythonExecutable)) {
-    const errorMessage = `Packaged Python executable not found at: ${pythonExecutable}`;
+  
+  // Check if Python executable exists
+  if (!fs.existsSync(pythonExecutable)) {
+    const errorMessage = `Python executable not found at: ${pythonExecutable}`;
     console.error(errorMessage);
     dialog.showErrorBox("Backend Error", errorMessage);
     app.quit();
     return;
   }
+  
   pythonProcess = spawn(pythonExecutable, [
     "-m",
     "uvicorn",
