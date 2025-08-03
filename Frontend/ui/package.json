@@ -65,15 +65,6 @@
       "dist-electron",
       "package.json"
     ],
-    "extraResources": [
-      {
-        "from": "../../career-app",
-        "to": "app/career-app",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
     "directories": {
       "buildResources": "assets",
       "output": "release"
