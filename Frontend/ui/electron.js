@@ -129,6 +129,10 @@ const setupAndStartBackend = async () => {
   updateLoadingIndicator("Installing required packages...");
   try {
     await runCommand(pythonExecutable, ['-m', 'pip', 'install', '-r', requirementsPath], { cwd: serverPath });
+    if (process.platform === 'win32') {
+      await runCommand(pythonExecutable, ['-m', 'pip', 'install', 'torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128'], { cwd: serverPath });
+    }
+    
     log("Dependencies installed successfully.");
   } catch (err) {
     error(`Failed to install dependencies: ${err}`);

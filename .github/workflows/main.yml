@@ -27,12 +27,8 @@ jobs:
         run: |
           curl -L -o python.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250610/cpython-3.11.13+20250610-x86_64-apple-darwin-install_only.tar.gz
           tar -xzf python.tar.gz -C career-app/
-          mv career-app/python career-app/venv
+          mv career-app/python career-app/portable-python
 
-      - name: Install Python dependencies
-        run: |
-          career-app/venv/bin/python3 -m pip install --upgrade pip
-          career-app/venv/bin/python3 -m pip install -r career-app/requirements.txt
 
       - name: Build macOS application
         run: npm run electron:build
@@ -72,12 +68,6 @@ jobs:
           tar -xzf python.tar.gz
           Move-Item -Path python -Destination career-app/python-portable
 
-      - name: Install Python dependencies
-        run: |
-          career-app/python-portable/python.exe -m pip install --upgrade pip
-          career-app/python-portable/python.exe -m pip install -r career-app/requirements.txt
-          career-app/python-portable/python.exe -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-
       - name: Build Windows application
         run: npm run electron:build
         working-directory: Frontend/ui
@@ -86,7 +76,7 @@ jobs:
         if: always() # This ensures the artifact is uploaded even if the build fails
         uses: actions/upload-artifact@v4
         with:
-          name: career-coach-win-build-output
+          name: career-coach-win-build
           path: Frontend/ui/release/
 
   # Job to create a public GitHub release
