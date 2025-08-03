@@ -1,4 +1,8 @@
 # main.py
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
 import torch
 from unsloth import FastLanguageModel
 from transformers import TextStreamer
@@ -16,7 +20,7 @@ from fastapi.responses import StreamingResponse
 # --- 1. Correct the Model Path ---
 # Load from the final output directory, not the intermediate checkpoint.
 # This directory contains the all-important 'adapter_config.json'.
-MODEL_PATH = "models/checkpoint-1000" 
+MODEL_PATH = "DIIZZY/career-coach-v2" 
 model, tokenizer = None, None
 
 try:
@@ -115,6 +119,11 @@ def response_generator(streamer: QueueTextStreamer, thread: threading.Thread):
         if token is None:
             break
         yield token
+
+@app.get("/")
+async def root():
+    return {"message": "Career Coach API is running!"}
+
 
 @app.post("/query")
 async def query_career_coach(

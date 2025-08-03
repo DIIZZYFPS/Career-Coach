@@ -1,0 +1,130 @@
+# Name of the workflow
+name: Build and Release Electron App
+
+# This workflow runs on pushes to the main branch
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  # Job to build the macOS application
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: Frontend/ui
+
+      - name: Set up portable Python
+        run: |
+          curl -L -o python.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250610/cpython-3.11.13+20250610-x86_64-apple-darwin-install_only.tar.gz
+          tar -xzf python.tar.gz -C career-app/
+          mv career-app/python career-app/venv
+
+      - name: Install Python dependencies
+        run: |
+          career-app/venv/bin/python3 -m pip install --upgrade pip
+          career-app/venv/bin/python3 -m pip install -r career-app/requirements.txt
+
+      - name: Build macOS application
+        run: npm run electron:build
+        working-directory: Frontend/ui
+        env:
+          # This is important for macOS notarization if you set it up
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: career-coach-macos-build
+          path: Frontend/ui/release/*.dmg
+
+  # Job to build the Windows application
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: Frontend/ui
+
+      - name: Set up portable Python
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri https://github.com/astral-sh/python-build-standalone/releases/download/20250610/cpython-3.11.13+20250610-x86_64-pc-windows-msvc-install_only.tar.gz -OutFile python.tar.gz
+          tar -xzf python.tar.gz -C career-app/
+          Move-Item -Path career-app/python -Destination career-app/venv
+
+      - name: Install Python dependencies
+        run: |
+          career-app/venv/python.exe -m pip install --upgrade pip
+          career-app/venv/python.exe -m pip install -r career-app/requirements.txt
+          career-app/venv/python.exe -m pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+
+      - name: Build Windows application
+        run: npm run electron:build
+        working-directory: Frontend/ui
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: career-coach-win-build
+          path: Frontend/ui/release/*.exe
+
+  # Job to create a public GitHub release
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-macos, build-windows]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Download macOS build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: career-coach-macos-build
+          path: release/
+
+      - name: Download Windows build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: career-coach-win-build
+          path: release/
+          
+      - name: Get project version
+        id: get_version
+        run: echo "VERSION=$(node -p \"require('./Frontend/ui/package.json').version\")" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.dmg
+            release/*.exe
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          name: Release v${{ steps.get_version.outputs.VERSION }}
+          body: "Automated release of macOS and Windows builds."

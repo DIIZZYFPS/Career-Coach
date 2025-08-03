@@ -3,13 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "../electron/main.js",
+  "main": "dist-electron/electron.js",
+  "description": "Career Coach - Your personal guide to career success",
+  "author": "DIIZZY",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\""
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "vite build && electron-builder"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
@@ -31,7 +34,9 @@
     "react-router-dom": "^7.7.0",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
@@ -40,14 +45,47 @@
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "electron": "^37.2.5",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "rimraf": "^6.0.1",
     "tw-animate-css": "^1.3.5",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
     "vite": "^7.0.4",
     "wait-on": "^8.0.4"
+  },
+  "build": {
+    "appId": "com.example.careerCoach",
+    "productName": "Career Coach",
+    "files": [
+      "dist",
+      "dist-electron",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../../career-app",
+        "to": "app/career-app",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "release"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }
