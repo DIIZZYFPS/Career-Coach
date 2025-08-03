@@ -108,7 +108,7 @@ jobs:
           
       - name: Get project version
         id: get_version
-        run: echo "VERSION=$(node -p \"require('./Frontend/ui/package.json').version\")" >> $GITHUB_OUTPUT
+        run: echo "VERSION=$(node -p 'require(\"./Frontend/ui/package.json\").version')" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
