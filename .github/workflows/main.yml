@@ -76,7 +76,7 @@ jobs:
         run: |
           career-app/venv/python.exe -m pip install --upgrade pip
           career-app/venv/python.exe -m pip install -r career-app/requirements.txt
-          career-app/venv/python.exe -m pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+          career-app/venv/python.exe -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 
       - name: Build Windows application
         run: npm run electron:build
