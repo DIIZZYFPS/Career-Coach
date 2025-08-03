@@ -82,11 +82,12 @@ jobs:
         run: npm run electron:build
         working-directory: Frontend/ui
 
-      - name: Upload Windows artifact
+      - name: Upload Windows Build Artifacts
+        if: always() # This ensures the artifact is uploaded even if the build fails
         uses: actions/upload-artifact@v4
         with:
-          name: career-coach-win-build
-          path: Frontend/ui/release/*.exe
+          name: career-coach-win-build-output
+          path: Frontend/ui/release/
 
   # Job to create a public GitHub release
   release:
