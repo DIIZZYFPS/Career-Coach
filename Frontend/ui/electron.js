@@ -88,7 +88,7 @@ const setupAndStartBackend = async () => {
 
   const venvPath = path.join(serverPath, "venv");
   const requirementsPath = path.join(serverPath, "requirements.txt");
-  const portablePythonPath = path.join(serverPath, "python-portable", "python.exe");
+  const portablePythonPath = process.platform === 'win32' ? path.join(serverPath, "python-portable", "python.exe") : path.join(serverPath, "python-portable", "bin", "python");
 
 
   const systemPython = app.isPackaged
