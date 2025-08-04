@@ -25,7 +25,7 @@ jobs:
 
       - name: Set up portable Python
         run: |
-          curl -L -o python.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250610/cpython-3.11.13+20250610-x86_64-apple-darwin-install_only.tar.gz
+          curl -L -o python.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250610/cpython-3.11.13+20250610-aarch64-apple-darwin-install_only.tar.gz
           tar -xzf python.tar.gz -C career-app/
           mv career-app/python career-app/python-portable
 
@@ -105,10 +105,11 @@ jobs:
         with:
           name: career-coach-win-build
           path: release/
-          
+
       - name: Get project version
         id: get_version
-        run: echo "VERSION=$(node -p 'require(\"./Frontend/ui/package.json\").version')" >> $GITHUB_OUTPUT
+        working-directory: ./Frontend/ui
+        run: echo "VERSION=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
