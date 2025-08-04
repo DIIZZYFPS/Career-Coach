@@ -3,6 +3,11 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 sys.stderr.reconfigure(encoding='utf-8')
 
+# ---------------------------------------------------
+import os
+os.environ["UNSLOTH_COMPILE_DISABLE"] = "1" # Temporary fix for unsloth compile issues will be removed in future versions
+# ---------------------------------------------------
+
 import torch
 from unsloth import FastLanguageModel
 from transformers import TextStreamer
