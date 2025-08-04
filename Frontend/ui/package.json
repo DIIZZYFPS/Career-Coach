@@ -1,7 +1,7 @@
 {
-  "name": "ui",
+  "name": "career-coach",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "dist-electron/electron.js",
   "description": "Career Coach - Your personal guide to career success",
@@ -58,7 +58,7 @@
     "wait-on": "^8.0.4"
   },
  "build": {
-    "appId": "com.example.careerCoach",
+    "appId": "com.diizzy.career-coach",
     "productName": "Career Coach",
     "files": [
       "dist",
