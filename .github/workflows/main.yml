@@ -27,7 +27,7 @@ jobs:
         run: |
           curl -L -o python.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250610/cpython-3.11.13+20250610-x86_64-apple-darwin-install_only.tar.gz
           tar -xzf python.tar.gz -C career-app/
-          mv career-app/python career-app/portable-python
+          mv career-app/python career-app/python-portable
 
 
       - name: Build macOS application
