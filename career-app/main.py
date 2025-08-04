@@ -148,9 +148,9 @@ async def query_career_coach(
     prompt = format_prompt_from_history(conversation)
     inputs = tokenizer([prompt], return_tensors="pt").to("cuda")
     
-    streamer = QueueTextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    streamer = QueueTextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=False)
 
-    eos_token_id = tokenizer.eos_token_id
+   
 
     generation_kwargs = dict(
         inputs,
@@ -160,7 +160,7 @@ async def query_career_coach(
         temperature=0.7,
         top_p=0.95,
         top_k=50, 
-        eos_token_id=eos_token_id
+        eos_token_id=tokenizer.eos_token_id
     )
 
     thread = threading.Thread(target=model.generate, kwargs=generation_kwargs)
