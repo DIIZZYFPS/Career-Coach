@@ -6,6 +6,11 @@
 
 An AI-powered career coaching application that analyzes resumes against job descriptions, identifies skill gaps, and provides personalized career guidance. Built with a fine-tuned language model and modern desktop technologies.
 
+## Important Note
+
+As of right now due to the lack of macOS support with Unsloth the Mac version currently does not work, I am aware of this and am working on a workaround.
+
+
 ## ✨ Features
 
 - **Resume Analysis**: Upload PDF or DOCX resumes for detailed analysis
